@@ -58,7 +58,7 @@ class ArchWikiCVEScrapper:
         self.issues = []
         self._cveRE = re.compile(r'cve\-\d{4}\-\d{4,}', re.IGNORECASE)
         self._linksRE = re.compile(r'\[\s*(https?://[^\]\s]+)\s*([^\]]*)\]', re.IGNORECASE)
-        self._packageRE = re.compile(r'\{\{pkg\|([a-z\d-]+)\}\}', re.IGNORECASE)
+        self._packageRE = re.compile(r'\{\{pkg\|([a-z\d-+]+)\}\}', re.IGNORECASE)
         self._versionRE = re.compile(r'^([<>]?=?)?\s*(\d+:)?[.a-zA-Z\d_-]+(-\d+)?$')
         self._responseTimeRE = re.compile(r'^[<~>]?\s*\d+[dmy]$', re.IGNORECASE)
         self._statusRE = re.compile(r'Fixed|Rejected|Invalid|\'\'\'Vulnerable\'\'\'')
