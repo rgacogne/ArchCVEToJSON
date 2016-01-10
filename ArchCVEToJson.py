@@ -58,7 +58,7 @@ class ArchWikiCVEScrapper:
         self.issues = []
         self._cveRE = re.compile(r'cve\-\d{4}\-\d{4,}', re.IGNORECASE)
         self._linksRE = re.compile(r'\[\s*(https?://[^\]\s]+)\s*([^\]]*)\]', re.IGNORECASE)
-        self._packageRE = re.compile(r'\{\{pkg\|([a-z\d-+]+)\}\}', re.IGNORECASE)
+        self._packageRE = re.compile(r'\{\{pkg\|([a-z\d+_*-]+)\}\}', re.IGNORECASE)
         self._versionRE = re.compile(r'^([<>]?=?)?\s*(\d+:)?[.a-zA-Z\d_-]+(-\d+)?$')
         self._responseTimeRE = re.compile(r'^[<~>]?\s*\d+[dmy]$', re.IGNORECASE)
         self._statusRE = re.compile(r'Fixed|Rejected|Invalid|\'\'\'Vulnerable\'\'\'')
@@ -70,7 +70,7 @@ class ArchWikiCVEScrapper:
         if cves:
             # remove duplicates
             cves = list(set(cves))
-            cves.sort(key=lambda x: x.lower())            
+            cves.sort(key=lambda x: x.lower())
             return [str(x) for x in cves]
         return []
 
@@ -160,6 +160,10 @@ class ArchWikiCVEScrapper:
         status = self._parseStatus(parts[6])
         bts = self._parseBTEntries(parts[6])
         asas = self._parseASAs(parts[7])
+
+        if len(packages) == 0:
+            print('An issue should concern at least one package, skipping!')
+            return
 
         self.issues.append(ArchIssue(packages, disclosureDate, affectedVersion, status, bts, cves, links, fixedVersion, responseTime, asas))
 
