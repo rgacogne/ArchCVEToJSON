@@ -31,7 +31,7 @@ class ArchSecurityAdvisoryLink:
                           sort_keys=True,
                           indent=4)
 
-class ArchIssue(json.JSONEncoder):
+class ArchIssue:
 
     def __init__(self, packages, disclosureDate, vulnerableVersion, status, btEntries=[], cves=[], links=[], fixedVersion=None, responseTime=None, asas=[]):
         self.status = status
