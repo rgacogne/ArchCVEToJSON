@@ -162,7 +162,7 @@ class ArchWikiCVEScrapper:
         asas = self._parseASAs(parts[7])
 
         if len(packages) == 0:
-            print('An issue should concern at least one package, skipping!')
+            print('An issue should concern at least one package, skipping!', file=sys.stderr)
             return
 
         self.issues.append(ArchIssue(packages, disclosureDate, affectedVersion, status, bts, cves, links, fixedVersion, responseTime, asas))
