@@ -14,7 +14,11 @@ Arch Linux Security Advisories Generator
 Based on the JSON output of `ArchCVEToJSON.py`, `JSONToASA.py` generates the
 template of the Security Advisory for a specific vulnerability.
 
-Usage is JSONToASA.py <JSON database file> <package> <CVE number>|<fixed version> <ASA identifier> <vulnerabilty type>
+Usage is:
+
+```
+JSONToASA.py <JSON database file> <package> <CVE number>|<fixed version> <ASA identifier> <vulnerabilty type>
+```
 
 For example, to generate the template for the ASA ASA-201603-15, for a denial
 of service vulnerability fixed in the 2.0.2-1 version of the package named
