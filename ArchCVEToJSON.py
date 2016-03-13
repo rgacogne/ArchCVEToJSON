@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-import httplib2
 import json
 import re
-import string
 import sys
 import time
+import httplib2
 
 class ArchIssueLink:
     def __init__(self, link, description=None):
@@ -33,17 +32,17 @@ class ArchSecurityAdvisoryLink:
 
 class ArchIssue:
 
-    def __init__(self, packages, disclosureDate, vulnerableVersion, status, btEntries=[], cves=[], links=[], fixedVersion=None, responseTime=None, asas=[]):
+    def __init__(self, packages, disclosureDate, vulnerableVersion, status, btEntries=None, cves=None, links=None, fixedVersion=None, responseTime=None, asas=None):
         self.status = status
-        self.cves = cves
-        self.links = links
+        self.cves = cves or []
+        self.links = links or []
         self.packages = packages
         self.vulnerableVersion = vulnerableVersion
         self.fixedVersion = fixedVersion
         self.disclosureDate = disclosureDate
-        self.asas = asas
+        self.asas = asas or []
         self.responseTime = responseTime
-        self.btEntries = btEntries
+        self.btEntries = btEntries or []
 
     def to_JSON(self):
         return json.dumps(self,
@@ -92,12 +91,13 @@ class ArchWikiCVEScrapper:
             return entries
         return []
 
-    def _parseDate(self, value):
+    @staticmethod
+    def _parseDate(value):
         value = value.strip()
         try:
             return time.strftime("%Y-%m-%d", time.strptime(value, "%Y-%m-%d"))
         except ValueError:
-             return None
+            return None
 
     def _parseVersion(self, value):
         value = value.strip()

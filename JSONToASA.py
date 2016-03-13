@@ -11,17 +11,18 @@ import sys
 def getUpstreamVersion(version):
     return version.rsplit('-', 1)[0]
 
-def printSubject(asa, issue, package, vulnType):
+def printSubject(asa, package, vulnType):
     print('[%s] %s: %s' % (asa, package, vulnType))
 
 def printBody(asa, issue, package, vulnType):
     header = "Arch Linux Security Advisory %s" % (asa)
     cveStr = ''
-    for cve in issue['cves']:
-        if len(cveStr) > 0:
-            cveStr = cveStr + ' ' + cve
-        else:
-            cveStr = cve
+    if 'cves' in issue:
+        for cve in sorted(issue['cves']):
+            if len(cveStr) > 0:
+                cveStr = cveStr + ' ' + cve
+            else:
+                cveStr = cve
 
     oldUpstreamVersion = getUpstreamVersion(issue['vulnerableVersion'])
     upstreamFixedVersion = getUpstreamVersion(issue['fixedVersion'])
@@ -51,7 +52,10 @@ def printBody(asa, issue, package, vulnType):
     print()
     print('# pacman -Syu "%s>=%s"' % (package, issue['fixedVersion']))
     print()
-    print('The problem has been fixed upstream in version %s.' % (upstreamFixedVersion))
+    if upstreamFixedVersion:
+        print('The problem has been fixed upstream in version %s.' % (upstreamFixedVersion))
+    else:
+        print('This problem has been fixed upstream but no release is available yet.')
     print()
     print('Workaround')
     print('==========')
@@ -63,6 +67,11 @@ def printBody(asa, issue, package, vulnType):
     print()
     print('<Long description, for example from original advisory>.')
     print()
+    if 'cves' in issue and len(issue['cves']) > 1:
+        for cve in sorted(issue['cves']):
+            print('- %s:' % (cve))
+            print()
+        print()
     print('Impact')
     print('======')
     print()
@@ -78,7 +87,7 @@ def printBody(asa, issue, package, vulnType):
     for link in issue['links']:
         if 'link' in link:
             print(link['link'])
-    for cve in issue['cves']:
+    for cve in sorted(issue['cves']):
         print('https://access.redhat.com/security/cve/%s' % (cve))
 
 def printASA(asa, issue, package, vulnType):
@@ -86,39 +95,44 @@ def printASA(asa, issue, package, vulnType):
         print('Warning, this issue is not marked Fixed but %s!' % (issue['status']), file=sys.stderr)
     if not issue['fixedVersion']:
         print('Warning, this issue does not have a fixed version!', file=sys.stderr)
-    printSubject(asa, issue, package, vulnType)
+    if 'asas' in issue and len(issue['asas']) > 0:
+        print('Warning, an ASA has already been sent for this issue!', file=sys.stderr)
+
+    printSubject(asa, package, vulnType)
     print()
     printBody(asa, issue, package, vulnType)
 
-if __name__ == "__main__":
-    if len(sys.argv) != 6:
-        sys.exit('Usage: %s <JSON database> <package> <CVE number>|<fixed version> <ASA identifier> <vulnerabilty type>' % (sys.argv[0]))
-
-    dbFile = sys.argv[1]
-    package = sys.argv[2]
-    asa = sys.argv[4]
-    vulnType = sys.argv[5]
+def generateASA(params):
+    dbFile = params[1]
+    package = params[2]
+    asa = params[4]
+    vulnType = params[5]
     versionRE = re.compile(r'^([<>]?=?)?\s*(\d+:)?[.a-zA-Z\d_-]+(-\d+)?$')
     cveRE = re.compile(r'cve\-\d{4}\-\d{4,}', re.IGNORECASE)
 
-    if cveRE.match(sys.argv[3]):
-        cve = sys.argv[3]
+    if cveRE.match(params[3]):
+        cve = params[3]
         version = None
-    elif versionRE.match(sys.argv[3]):
+    elif versionRE.match(params[3]):
         cve = None
-        version = sys.argv[3]
+        version = params[3]
     else:
-        sys.exit('Third parameter (%s) does not look like a valid CVE identifier or version number, exiting.' % (sys.argv[3]))
+        sys.exit('Third parameter (%s) does not look like a valid CVE identifier or version number, exiting.' % (params[3]))
 
-    if not os.path.isfile(sys.argv[1]):
-        sys.exit("JSON database %s does not exist!" % (sys.argv[1]))
+    if not os.path.isfile(dbFile):
+        sys.exit("JSON database %s does not exist!" % (dbFile))
 
-    with open(sys.argv[1]) as db:
+    with open(params[1]) as db:
         issuesJSON = json.load(db)
 
-    issues = []
     for issue in issuesJSON:
         if package in issue['packages']:
             if (version and version == issue['fixedVersion']) or (cve and cve in issue['cves']):
                 printASA(asa, issue, package, vulnType)
                 break
+
+if __name__ == "__main__":
+    if len(sys.argv) != 6:
+        sys.exit('Usage: %s <JSON database> <package> <CVE number>|<fixed version> <ASA identifier> <vulnerabilty type>' % (sys.argv[0]))
+
+    generateASA(sys.argv)
