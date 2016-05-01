@@ -27,7 +27,7 @@ def getCurrentVersion(package):
 
 def checkVulnerableEntriesUpdated(dbFile):
 
-    versionRE = re.compile(r'^([<>]?=?)?\s*((\d+:)?[.a-zA-Z\d_-]+(-\d+)?)$')
+    versionRE = re.compile(r'^([<>]?=?)?\s*((\d+:)?[.+a-zA-Z\d_-]+(-\d+)?)$')
     with open(dbFile) as db:
         issuesJSON = json.load(db)
 

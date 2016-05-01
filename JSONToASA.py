@@ -107,7 +107,7 @@ def generateASA(params):
     package = params[2]
     asa = params[4]
     vulnType = params[5]
-    versionRE = re.compile(r'^([<>]?=?)?\s*(\d+:)?[.a-zA-Z\d_-]+(-\d+)?$')
+    versionRE = re.compile(r'^([<>]?=?)?\s*(\d+:)?[.+a-zA-Z\d_-]+(-\d+)?$')
     cveRE = re.compile(r'cve\-\d{4}\-\d{4,}', re.IGNORECASE)
 
     if cveRE.match(params[3]):
