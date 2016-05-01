@@ -120,10 +120,15 @@ def generateASA(params):
         sys.exit('Third parameter (%s) does not look like a valid CVE identifier or version number, exiting.' % (params[3]))
 
     if not os.path.isfile(dbFile):
-        sys.exit("JSON database %s does not exist!" % (dbFile))
+        sys.exit('JSON database %s does not exist!' % (dbFile))
 
-    with open(params[1]) as db:
+    with open(dbFile) as db:
         issuesJSON = json.load(db)
+
+    for issue in issuesJSON:
+        for existingAsa in issue['asas']:
+            if existingAsa['asaId'] == asa:
+                sys.exit('This ASA number has already been used!')
 
     for issue in issuesJSON:
         if package in issue['packages']:
