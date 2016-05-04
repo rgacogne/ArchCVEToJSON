@@ -22,7 +22,10 @@ def getCurrentVersion(package):
             continue
         if not 'pkgrel' in result or not 'pkgver' in result:
             continue
-        return result['pkgver'] + '-' + result['pkgrel']
+        if not 'epoch' in result or result['epoch'] == 0:
+            return result['pkgver'] + '-' + result['pkgrel']
+        else:
+            return str(result['epoch']) + ':' + result['pkgver'] + '-' + result['pkgrel']
     return None
 
 def checkVulnerableEntriesUpdated(dbFile):
