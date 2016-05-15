@@ -60,7 +60,7 @@ class ArchWikiCVEScrapper:
         self._packageRE = re.compile(r'\{\{pkg\|([a-z\d+_*-]+)\}\}', re.IGNORECASE)
         self._versionRE = re.compile(r'^([<>]?=?)?\s*(\d+:)?[.+a-zA-Z\d_-]+(-\d+)?$')
         self._responseTimeRE = re.compile(r'^[<~>]?\s*\d+[dmy]$', re.IGNORECASE)
-        self._statusRE = re.compile(r'Fixed|Rejected|Invalid|\'\'\'Vulnerable\'\'\'')
+        self._statusRE = re.compile(r'(?:\'\'\')?(Fixed|Rejected|Invalid|Vulnerable)(?:\'\'\')?')
         self._btEntryRE = re.compile(r'\{\{bug\|(\d+)\}\}')
         self._asaRE = re.compile(r'\[\s*(https://[^\]\s]+)\s*(ASA-\d{6}-\d{1,})\]')
 
@@ -121,9 +121,7 @@ class ArchWikiCVEScrapper:
         value = value.strip()
         status = self._statusRE.match(value)
         if status:
-            if status.group(0) == '\'\'\'Vulnerable\'\'\'':
-                return 'Vulnerable'
-            return status.group(0)
+            return status.group(1)
 
         if value and value != '?' and value != '-':
             print('Warning, invalid status "' + value + '"', file=sys.stderr)
