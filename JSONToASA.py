@@ -138,6 +138,6 @@ def generateASA(params):
 
 if __name__ == "__main__":
     if len(sys.argv) != 6:
-        sys.exit('Usage: %s <JSON database> <package> <CVE number>|<fixed version> <ASA identifier> <vulnerabilty type>' % (sys.argv[0]))
+        sys.exit('Usage: %s <JSON database> <package> <CVE number>|<fixed version> <ASA identifier> <vulnerability type>' % (sys.argv[0]))
 
     generateASA(sys.argv)
